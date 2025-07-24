@@ -2,7 +2,7 @@
 
 ## 📊 Quick Reference
 
-**Base URL:** `https://mind-9nhqoiay9-garys-projects-14822d8b.vercel.app`  
+**Base URL:** `https://mind-be-ruddy.vercel.app`  
 **API Version:** v0.1.0  
 **Response Format:** JSON  
 **Authentication:** None required  
