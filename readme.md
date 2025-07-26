@@ -1,11 +1,26 @@
-# 🔗 Reflection Backend API - Frontend Integration Guide
+# 🧠 MindWeave Reflection Backend API
 
 ## 📊 Quick Reference
 
 **Base URL:** `https://mind-be-ruddy.vercel.app`  
-**API Version:** v0.1.0  
+**API Version:** v0.2.0  
 **Response Format:** JSON  
 **Authentication:** None required  
+
+---
+
+## 🆕 What's New in v0.2.0
+
+### 🎯 **MindWeave Features**
+- **Emotion Quantification**: Precise numerical emotion analysis (values sum to 1.0)
+- **Pattern Recognition**: Historical behavior insights with specific metrics
+- **YSYM Analysis**: "You Said You Meant" - reveals hidden emotional truths
+- **Smart Triggering**: YSYM only activates when negative emotions ≥ 60%
+
+### 🔄 **3-Stage Gemini Processing**
+1. **Emotion & Topic Analysis**: Quantified emotional breakdown + polarity
+2. **MindWeave Reflection**: Pattern recognition with historical context
+3. **YSYM Analysis**: Deep emotional insight (conditional)
 
 ---
 
@@ -15,16 +30,16 @@
 ```http
 GET /api/health
 ```
-**Use Case:** Check if API is running  
 **Response Time:** ~100ms  
 
 **Response:**
 ```json
 {
   "status": "healthy",
-  "timestamp": "2025-07-24T12:00:00",
-  "service": "reflection-backend",
-  "version": "0.1.0"
+  "timestamp": "2025-07-26T12:00:00",
+  "service": "mindweave-reflection-backend",
+  "version": "0.2.0",
+  "environment": "vercel"
 }
 ```
 
@@ -32,25 +47,34 @@ GET /api/health
 ```http
 GET /api/test
 ```
-**Use Case:** Test API with sample data  
-**Response Time:** ~3-5s  
+**Use Case:** Test all MindWeave features with sample data  
+**Response Time:** ~5-8s (3 Gemini API calls)  
 
-**Response:**
+**Sample Response:**
 ```json
 {
-  "sample_analysis": {
-    "entry_text": "Today I felt overwhelmed at work...",
-    "emotions": ["overwhelmed", "proud", "accomplished"],
-    "topics": ["work"],
-    "timestamp": "2025-07-24T12:00:00"
+  "analysis": {
+    "entry_text": "I stayed up until 3am working on my startup...",
+    "emotions_quantified": {
+      "overwhelmed": 0.4,
+      "anxious": 0.35,
+      "frustrated": 0.25
+    },
+    "emotion_polarity": {
+      "positive": 0.0,
+      "negative": 1.0
+    },
+    "topics": ["work", "health"],
+    "timestamp": "2025-07-26T12:00:00"
   },
-  "sample_reflection": "It's wonderful that you pushed through...",
-  "status": "success",
-  "message": "API is working correctly on Vercel"
+  "mindweave_reflection": "You've logged 11 late-night work sessions this month. Each time you mention being 'behind,' despite completing tasks. Your definition of 'caught up' appears to be a moving target.",
+  "ysym": true,
+  "ysym_analysis": "You said: I feel so behind → You meant: You're afraid your efforts will never be enough to meet your own impossible standards",
+  "status": "success"
 }
 ```
 
-### 3. Analyze Single Entry ⭐
+### 3. Analyze Entry ⭐ **MAIN ENDPOINT**
 ```http
 POST /api/analyze
 Content-Type: application/json
@@ -63,162 +87,124 @@ Content-Type: application/json
 }
 ```
 
-**Response:**
+**Complete Response Structure:**
 ```json
 {
   "analysis": {
-    "entry_text": "Your original text",
-    "emotions": ["happy", "excited", "grateful"],
-    "topics": ["family", "relationships"],
-    "timestamp": "2025-07-24T12:00:00"
-  },
-  "reflection": "Generated empathetic reflection text...",
-  "status": "success",
-  "processing_time": 2.34
-}
-```
-
-### 4. Batch Analyze ⭐
-```http
-POST /api/batch-analyze
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "entries": [
-    "First journal entry text",
-    "Second journal entry text",
-    "Third journal entry text"
-  ]
-}
-```
-**Limits:** Max 10 entries per request, 5000 chars per entry
-
-**Response:**
-```json
-{
-  "results": [
-    {
-      "analysis": {
-        "entry_text": "First journal entry text",
-        "emotions": ["happy", "content"],
-        "topics": ["family"],
-        "timestamp": "2025-07-24T12:00:00"
-      },
-      "reflection": "Generated reflection for first entry..."
+    "entry_text": "Sarah didn't text me back for 3 hours, I shouldn't have sent that message",
+    "emotions_quantified": {
+      "anxious": 0.7,
+      "regret": 0.2,
+      "self_doubt": 0.1
     },
-    {
-      "analysis": {
-        "entry_text": "Second journal entry text", 
-        "emotions": ["motivated", "excited"],
-        "topics": ["work", "goals"],
-        "timestamp": "2025-07-24T12:00:01"
-      },
-      "reflection": "Generated reflection for second entry..."
-    }
-  ],
+    "emotion_polarity": {
+      "positive": 0.0,
+      "negative": 1.0
+    },
+    "topics": ["relationships", "social"],
+    "timestamp": "2025-07-26T12:00:00"
+  },
+  "mindweave_reflection": "This mirrors 4 similar entries about delayed responses triggering self-doubt. You consistently interpret silence as rejection within a 2-4 hour window. Your anxiety peaks before any actual negative outcome occurs.",
+  "ysym": true,
+  "ysym_analysis": "You said: Sarah didn't text back → You meant: You're afraid of being rejected or abandoned",
   "status": "success",
-  "total_processed": 2,
-  "processing_time": 5.67
+  "processing_time": 4.2
+}
+```
+
+**When YSYM Doesn't Trigger (< 60% negative):**
+```json
+{
+  "analysis": {
+    "entry_text": "Had a great day! Finally finished that project",
+    "emotions_quantified": {
+      "happy": 0.5,
+      "accomplished": 0.3,
+      "proud": 0.2
+    },
+    "emotion_polarity": {
+      "positive": 1.0,
+      "negative": 0.0
+    },
+    "topics": ["work", "achievement"],
+    "timestamp": "2025-07-26T12:00:00"
+  },
+  "mindweave_reflection": "First positive entry in 8 days. Completion of concrete tasks consistently correlates with improved mood in your history. Your wellbeing appears tied to tangible accomplishments rather than effort expended.",
+  "ysym": false,
+  "status": "success",
+  "processing_time": 2.8
 }
 ```
 
 ---
 
-## 💻 Frontend Integration Examples
+## 🎯 Feature Deep Dive
 
-### JavaScript/TypeScript
+### **Emotion Quantification**
+- **Format**: `{"emotion": decimal_value}`
+- **Constraint**: All values sum to exactly 1.0
+- **Use Case**: Perfect for pie charts and emotion visualization
+- **Example**: `{"anxious": 0.6, "hopeful": 0.4}` = 60% anxious, 40% hopeful
 
-#### Basic Fetch
-```javascript
-// Single Analysis
-async function analyzeEntry(entryText) {
-  try {
-    const response = await fetch('https://mind-9nhqoiay9-garys-projects-14822d8b.vercel.app/api/analyze', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        entry_text: entryText
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Analysis failed:', error);
-    throw error;
-  }
-}
+### **MindWeave Reflections**
+**Philosophy**: Pattern recognition engine that connects behaviors to emotional outcomes
 
-// Usage
-const result = await analyzeEntry("Today I felt happy and accomplished!");
-console.log(result.analysis.emotions); // ["happy", "accomplished"]
-console.log(result.reflection); // Generated reflection text
-```
+**Characteristics**:
+- Direct but not harsh tone
+- Observational, not prescriptive  
+- Mentions specific numbers and frequencies
+- Reveals non-obvious behavioral patterns
+- No advice, just awareness
 
-#### Axios
-```javascript
-import axios from 'axios';
+**Example Patterns**:
+- "You've cancelled plans 4 times this week"
+- "11 late-night work sessions this month"
+- "First positive entry in 8 days"
 
-const API_BASE_URL = 'https://mind-9nhqoiay9-garys-projects-14822d8b.vercel.app';
+### **YSYM (You Said You Meant)**
+**Purpose**: Reveals the gap between surface statements and deeper emotions
 
-// Single Analysis
-export const analyzeEntry = async (entryText) => {
-  const response = await axios.post(`${API_BASE_URL}/api/analyze`, {
-    entry_text: entryText
-  });
-  return response.data;
-};
+**Trigger Condition**: Negative emotions ≥ 60%  
+**Format**: "You said: [surface] → You meant: [deeper truth]"
 
-// Batch Analysis
-export const batchAnalyze = async (entries) => {
-  const response = await axios.post(`${API_BASE_URL}/api/batch-analyze`, {
-    entries: entries
-  });
-  return response.data;
-};
+**Common Deep Patterns**:
+- Control fears: "I forgot to..." → "Afraid of losing control"
+- Abandonment fears: "They didn't respond" → "Afraid of rejection"
+- Perfectionism: "I'm behind" → "Standards keep moving higher"
 
-// Health Check
-export const checkHealth = async () => {
-  const response = await axios.get(`${API_BASE_URL}/api/health`);
-  return response.data;
-};
-```
+---
 
-### React Hook Example
+## 💻 Frontend Integration
+
+### **React Hook Example**
 ```typescript
 import { useState, useCallback } from 'react';
 
-interface AnalysisResult {
+interface MindWeaveAnalysis {
   analysis: {
     entry_text: string;
-    emotions: string[];
+    emotions_quantified: Record<string, number>;
+    emotion_polarity: { positive: number; negative: number };
     topics: string[];
     timestamp: string;
   };
-  reflection: string;
+  mindweave_reflection: string;
+  ysym: boolean;
+  ysym_analysis?: string;
   status: string;
   processing_time: number;
 }
 
-export const useReflectionAPI = () => {
+export const useMindWeaveAPI = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const analyzeEntry = useCallback(async (entryText: string): Promise<AnalysisResult | null> => {
+  const analyzeEntry = useCallback(async (entryText: string): Promise<MindWeaveAnalysis | null> => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await fetch('https://mind-9nhqoiay9-garys-projects-14822d8b.vercel.app/api/analyze', {
+      const response = await fetch('https://mind-be-ruddy.vercel.app/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ entry_text: entryText })
@@ -243,187 +229,124 @@ export const useReflectionAPI = () => {
 };
 ```
 
-### Vue.js Composable
-```typescript
-import { ref, reactive } from 'vue';
-
-export function useReflectionAPI() {
-  const loading = ref(false);
-  const error = ref<string | null>(null);
+### **Emotion Pie Chart Integration**
+```javascript
+// Perfect for Chart.js or similar libraries
+const createEmotionChart = (emotions_quantified) => {
+  const labels = Object.keys(emotions_quantified);
+  const data = Object.values(emotions_quantified);
+  const percentages = data.map(value => (value * 100).toFixed(1));
   
-  const analyzeEntry = async (entryText: string) => {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      const response = await fetch('https://mind-9nhqoiay9-garys-projects-14822d8b.vercel.app/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entry_text: entryText })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error);
-      }
-      
-      return await response.json();
-    } catch (err) {
-      error.value = err.message;
-      throw err;
-    } finally {
-      loading.value = false;
-    }
+  return {
+    labels: labels,
+    datasets: [{
+      data: percentages,
+      backgroundColor: [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'
+      ]
+    }]
   };
-  
-  return { analyzeEntry, loading: readonly(loading), error: readonly(error) };
-}
+};
+
+// Usage
+const result = await analyzeEntry("I feel anxious about tomorrow's presentation");
+const chartData = createEmotionChart(result.analysis.emotions_quantified);
 ```
 
----
-
-## ⚠️ Error Handling
-
-### Common Error Responses
-
-#### 400 - Bad Request
-```json
-{
-  "error": "entry_text field is required",
-  "status": "error"
-}
-```
-
-#### 500 - Server Error
-```json
-{
-  "error": "Internal server error",
-  "message": "Detailed error message",
-  "status": "error"
-}
-```
-
-### Frontend Error Handling
-```javascript
-try {
-  const result = await analyzeEntry(text);
-  // Handle success
-} catch (error) {
-  if (error.response?.status === 400) {
-    // Handle validation errors
-    alert('Please check your input');
-  } else if (error.response?.status === 500) {
-    // Handle server errors
-    alert('Server error, please try again later');
-  } else {
-    // Handle network errors
-    alert('Network error, check your connection');
-  }
-}
-```
-
----
-
-## 📊 Data Reference
-
-### Possible Emotions
-```javascript
-const EMOTIONS = [
-  'happy', 'sad', 'anxious', 'calm', 'excited', 'proud', 
-  'frustrated', 'overwhelmed', 'grateful', 'content', 
-  'stressed', 'relaxed', 'worried', 'confident', 'confused',
-  'angry', 'peaceful', 'hopeful', 'disappointed', 'motivated',
-  'tired', 'energetic', 'lonely', 'loved', 'fearful',
-  'optimistic', 'pessimistic', 'curious', 'satisfied', 'nervous'
-];
-```
-
-### Possible Topics
-```javascript
-const TOPICS = [
-  'family', 'work', 'exercise', 'relationships', 'health',
-  'travel', 'social', 'personal_growth', 'education', 'finances',
-  'hobbies', 'spiritual', 'career', 'creativity', 'nature',
-  'technology', 'food', 'entertainment', 'home', 'friends',
-  'goals', 'challenges'
-];
-```
-
----
-
-## ⚡ Performance & Best Practices
-
-### Response Times
-- **Cold Start:** 3-5 seconds (first request after idle)
-- **Hot Requests:** 1-3 seconds (subsequent requests)
-- **Batch Processing:** 2-10 seconds (depending on entry count)
-
-### Optimization Tips
-1. **Show Loading States:** Always show loading indicators for 2-5 second delays
-2. **Implement Retry Logic:** Handle temporary failures gracefully
-3. **Cache Results:** Consider caching analysis results to avoid re-processing
-4. **Debounce Input:** For real-time analysis, debounce user input
-5. **Batch When Possible:** Use batch endpoint for multiple entries
-
-### Rate Limiting
-- No explicit rate limits currently
-- Recommended: Max 1 request per second per user
-- Use request queuing for multiple rapid requests
-
----
-
-## 🧪 Testing
-
-### Test Data
-```javascript
-// Test cases for your frontend
-const testCases = [
-  {
-    input: "Today I felt overwhelmed at work but completed my project.",
-    expectedEmotions: ["overwhelmed", "accomplished", "proud"],
-    expectedTopics: ["work"]
-  },
-  {
-    input: "Had a wonderful time with family at dinner.",
-    expectedEmotions: ["happy", "grateful", "content"],
-    expectedTopics: ["family", "social"]
-  },
-  {
-    input: "Yoga session helped me feel centered and peaceful.",
-    expectedEmotions: ["calm", "peaceful", "centered"],
-    expectedTopics: ["exercise", "health"]
-  }
-];
-```
-
-### Health Check Integration
-```javascript
-// Add to your app's health check
-const checkAPIHealth = async () => {
-  try {
-    const response = await fetch('https://mind-9nhqoiay9-garys-projects-14822d8b.vercel.app/api/health');
-    const data = await response.json();
-    return data.status === 'healthy';
-  } catch {
-    return false;
-  }
+### **YSYM Conditional Rendering**
+```jsx
+const AnalysisResults = ({ result }) => {
+  return (
+    <div className="analysis-container">
+      {/* Always show these */}
+      <EmotionChart data={result.analysis.emotions_quantified} />
+      <MindWeaveReflection text={result.mindweave_reflection} />
+      
+      {/* Conditionally show YSYM */}
+      {result.ysym && (
+        <div className="ysym-analysis">
+          <h3>Deeper Insight</h3>
+          <p>{result.ysym_analysis}</p>
+        </div>
+      )}
+    </div>
+  );
 };
 ```
 
 ---
 
-## 🚀 Ready to Integrate!
+## 🔬 Testing & Development
 
-**Next Steps:**
-1. Test the API endpoints using the examples above
-2. Implement error handling for your use cases
-3. Add loading states for better UX
-4. Consider caching strategies for frequently accessed data
+### **Test Cases for Frontend**
+```javascript
+const testCases = [
+  // Triggers YSYM (high negative emotions)
+  {
+    input: "I forgot to go to the gym again, I feel terrible about myself",
+    expectYSYM: true,
+    expectedNegative: "> 60%"
+  },
+  
+  // Doesn't trigger YSYM (positive emotions)
+  {
+    input: "Had an amazing workout today, feeling energized and proud",
+    expectYSYM: false,
+    expectedNegative: "< 60%"
+  },
+  
+  // Boundary case (around 60% negative)
+  {
+    input: "Work was stressful but I managed to finish the project",
+    expectYSYM: "maybe", // depends on exact emotion analysis
+    expectedNegative: "~60%"
+  }
+];
+```
 
-**Need Help?** 
-- Test all endpoints work: ✅
-- Response format is consistent: ✅  
-- Error handling is clear: ✅
-- Performance is acceptable: ✅
+### **Error Handling**
+```javascript
+const handleAnalysisError = (error) => {
+  if (error.message.includes('5000 characters')) {
+    return "Entry too long. Please keep under 5000 characters.";
+  }
+  if (error.message.includes('rate limit')) {
+    return "Too many requests. Please wait a moment and try again.";
+  }
+  return "Analysis temporarily unavailable. Please try again.";
+};
+```
 
-**Contact:** gary@agryyang.in
+---
+
+## 📈 Performance & Best Practices
+
+### **Response Times**
+- **2 API calls** (no YSYM): ~2-3 seconds
+- **3 API calls** (with YSYM): ~4-6 seconds
+- **Health check**: ~100ms
+
+### **Frontend Recommendations**
+1. **Show Progressive Loading**: Display steps as they complete
+2. **Implement Smart Retry**: Retry on 5xx errors, not 4xx
+3. **Cache Wisely**: Don't cache failed analyses
+4. **Validate Input**: Check length client-side before sending
+5. **Handle YSYM**: Always check the `ysym` boolean flag
+
+### **Rate Limiting**
+- **Recommended**: Max 1 analysis per 3 seconds per user
+- **Reason**: Each analysis uses 2-3 Gemini API calls
+- **Implementation**: Debounce user input appropriately
+
+---
+
+## 🎯 Ready to Build Amazing Experiences!
+
+**Key Integration Points:**
+- ✅ Emotion quantification for beautiful visualizations
+- ✅ Pattern recognition for meaningful insights  
+- ✅ Conditional deep analysis for powerful moments
+- ✅ Consistent API structure with clear error handling
+
+**Contact:** gary@agryyang.in  
+**Repository:** https://github.com/Gary0302/Mind_BE
