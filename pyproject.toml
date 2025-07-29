@@ -1,15 +1,15 @@
 # pyproject.toml
 [project]
 name = "reflection-backend"
-version = "0.1.0"
-description = "Backend API for emotion analysis and reflection generation using Gemini AI"
+version = "0.2.0"
+description = "Backend API for emotion analysis and reflection generation using Gemini AI with Supabase integration"
 authors = [
     {name = "Gary", email = "gary@agryyang.in"}
 ]
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.9"
-keywords = ["ai", "emotion-analysis", "gemini", "flask", "api"]
+keywords = ["ai", "emotion-analysis", "gemini", "flask", "api", "supabase", "mindweave"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -28,6 +28,14 @@ dependencies = [
     "google-genai>=0.1.0",
     "python-dotenv>=1.0.0",
     "gunicorn>=21.0.0",
+    # Supabase and auth
+    "supabase>=2.0.0",
+    "gotrue>=2.0.0",
+    "pyjwt>=2.8.0",
+    # Date/time handling
+    "python-dateutil>=2.8.0",
+    # Enhanced error handling
+    "requests>=2.31.0",
 ]
 
 [project.optional-dependencies]
